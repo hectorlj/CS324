@@ -1,0 +1,15 @@
+1. SAME ALLOCATED AND SAME CONTENTS
+s2
+a1, a2, a3, a4
+
+2.
+
+3.
+
+4. d1 and d2
+
+5. s1, s2
+   s1, b1
+   s1, d1
+ 
+they point to different parts of memory
