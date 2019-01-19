@@ -44,17 +44,22 @@ int main(int argc, char *argv[]) {
        	d2[5] = '4';
 
 	/* Test some comparisons here */
-	if (strcmp(s1, s2) == 0) {
+	if (strcmp(c2, c1) == 0) {
 		printf("Strings are the same!\n");
 	} else {
 		printf("Strings are NOT the same!\n");
 	}
 
 	/* Test size of arrays */
-	if (sizeof(s1) == sizeof(s2)) {
+	if (sizeof(c2) == sizeof(c1)) {
 		printf("Array sizes are the same!\n");
 	} else {
 		printf("Array sizes are NOT the same!\n");
 	}
+    if(s1 == e1){
+        printf("pointers are pointing to the same thing!\n");
+    } else {
+        printf("pointers are NOT pointing to the same thing!\n");
+    }
 
 }

@@ -1,15 +1,29 @@
-1. SAME ALLOCATED AND SAME CONTENTS
-s2
-a1, a2, a3, a4
+1. s2, a1, a2, a3, a4
 
-2.
+2. s1 and e1 have the same pointer values
 
-3.
+    using the == operator compares the values of the pointers, so it checks what they are pointing to, but to compare the whole string array we use strcmp(). that is why s1 and s2 have the same string value, while not pointing to the 
 
-4. d1 and d2
+3.  s1, s2,
+    a1, a2, a3, a4,
+    c1, c2,
+    d1,
+    e1
+    a c string is a sequence of bytes terminated by and including a '\0'. when instantiatied as an array it needs to be included as the last element. When defined as var = "some string", the null terminator is automatically assigned to the end of the string.
 
-5. s1, s2
-   s1, b1
-   s1, d1
- 
-they point to different parts of memory
+4.  s1, s2,
+    a1, a2, a3, a4,
+    b1, b2, b3, b4,
+    c1, c2,
+    d1, d2,
+    e1
+    they are all pointers, even if they are not all valid c strings. 
+
+5. returns 0:
+    s1, s2
+    s1, a1
+    c1, c2
+    s1, d1
+    s1, e1
+
+    s1 and b1 - b1 does not have a newline char, so it is not a string, so it does not match s1
