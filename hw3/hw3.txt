@@ -1,0 +1,129 @@
+1.	it first sleeps for 30 seconds, and then checks if there are any arguments. if not it will exit, other wise it runs execve on the program specified as an argument
+
+2.	if there are arguments it will print to stdout -> "Running exec of <first argument>"
+	it will then run execve on the first argument
+	it will then print to stdout -> "End of program <program name>"
+
+3.	hlj239@louisiana:~/Documents/CS324/hw3$ ./exec /bin/cat
+Program "./exec" has pid 22122. Sleeping.
+Running exec of "/bin/cat"
+
+4.	hlj239@louisiana:~/Documents/CS324/hw3$ ps -o user,pid,ppid,state,ucmd 22444
+	USER       PID  PPID S CMD
+	hlj239   22444 22068 S exec
+	hlj239@louisiana:~/Documents/CS324/hw3$ ps -o user,pid,ppid,state,ucmd 22444
+	USER       PID  PPID S CMD
+hlj239   22444 22068 S cat
+
+5.	everything is the same, except for the command executed because the program specifies that another program be executed, if it exists
+
+6.	hlj239@louisiana:~/Documents/CS324/hw3$ ./exec
+Program "./exec" has pid 22618. Sleeping.
+No program to exec.  Exiting...
+	The program was executed without an argument and so the exec program terminated
+
+7.	the program runs fork. if it returns -1 it terminates
+	then it prints the section and pid, then goes to sleep
+	if the pid is 0 then it prints section b, sleeps then terminates
+	if pid is not 0 then it prints section c, sleeps twice the terminates
+	the program then ends by printing section d and then sleeps for 30 seconds again
+
+8.	A -> parent & child
+	B -> child
+	C -> parent
+	D -> neither, both exit before they reach here
+
+9.	hlj239@louisiana:~/Documents/CS324/hw3$ ./fork
+	Starting program; process has pid 23479
+	Section A;  pid 23479
+	Section A;  pid 23480
+	Section C
+	Section B
+	Section B done sleeping
+	Section C done sleeping
+	hlj239@louisiana:~/Documents/CS324/hw3$ ps -C fork --forest  -o user,pid,ppid,state,ucmd
+	USER       PID  PPID S CMD
+	hlj239   23479 22068 S fork
+	hlj239   23480 23479 S  \_ fork
+	hlj239@louisiana:~/Documents/CS324/hw3$ ps -C fork --forest  -o user,pid,ppid,state,ucmd
+	USER       PID  PPID S CMD
+	hlj239   23479 22068 S fork
+	hlj239   23480 23479 Z  \_ fork <defunct>
+	hlj239@louisiana:~/Documents/CS324/hw3$
+
+10. the user, pid and ppid is the same, the states are different since the child made by the first fork is Z (zombie) instead of S (sleep). cmd is different between the two processes because the second is a child of the first process
+
+11.	call wait to reap the child after it exits, and it needs to be put in an else statement that is reachable only by the parent after fork is called
+
+12.	hlj239@louisiana:~/Documents/CS324/hw3$ ./fork
+	Starting program; process has pid 24335
+	Section A;  pid 24335
+	Section A;  pid 24336
+	Section C
+	Section B
+	Section C done sleeping
+	hlj239@louisiana:~/Documents/CS324/hw3$ ps -C fork --forest  -o user,pid,ppid,state,ucmd
+	USER       PID  PPID S CMD
+	hlj239   24335 22068 S fork
+	hlj239   24336 24335 S  \_ fork
+	hlj239@louisiana:~/Documents/CS324/hw3$ ps -C fork --forest  -o user,pid,ppid,state,ucmd
+	USER       PID  PPID S CMD
+	hlj239   24336     1 S fork
+
+13.	the user, pid, and s are the same, but the ppid and cmd have changed. This is because the parent was terminated before the child could finish and so it was made a child of process 1
+
+14.	hlj239@louisiana:~/Documents/CS324/hw3$ cat fork-output.txt
+	BEFORE FORK
+	SECTION A
+	SECTION A
+	SECTION B
+	SECTION C
+
+15. The parent and child write to the file the same way they write to stdout, the file descriptor for both is the same, so that is why the parent is able to write after the child (wait comes before SECTION C is printed)
+
+16.	hlj239@louisiana:~/Documents/CS324/hw3$ ./fork
+	Starting program; process has pid 25695
+	Section A;  pid 25695
+	Section A;  pid 25696
+	Section B
+	Section B done sleeping
+	hello from Section B
+
+	Section C
+	Section C done sleeping
+
+17.	hlj239@louisiana:~/Documents/CS324/hw3$ echo foobar | ./fork /bin/cat
+	Starting program; process has pid 25949
+	Section A;  pid 25949
+	Section A;  pid 25950
+	Section B
+	Section B done sleeping
+	Program "./fork" has pid 25950. Sleeping.
+	Program "./fork" has pid 28359. Sleeping.
+	Running exec of "/bin/cat"
+	foobar
+
+	Section C
+	Section C done sleeping
+
+18. hlj239@louisiana:~/Documents/CS324/hw3$ echo foobar | ./fork /bin/cat
+	Starting program; process has pid 27389
+	Section A;  pid 27389
+	Section A;  pid 27390
+	Section B
+	Section B done sleeping
+	Program "./fork" has pid 27390. Sleeping.
+	Program "./fork" has pid 28359. Sleeping.
+	Running exec of "/bin/cat"
+	foobar
+
+	Section C
+	Section C done sleeping
+	hlj239@louisiana:~/Documents/CS324/hw3$ cat fork-output.txt
+	BEFORE FORK
+	SECTION A
+	SECTION A
+	SECTION B
+	SECTION C
+
+	even though i added dup2(fileno(fdb), 1) I couldn't get the standard output to go to the fdb stream instead, so it messed with the hello from Section B string
