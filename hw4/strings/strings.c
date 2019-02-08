@@ -12,19 +12,21 @@
 //#1: Check if str equals the string "Hello World!"
 //You may assume that str is null-terminated
 int isHelloWorld(char* str) {
-    return (str == "Hello World!");
+    if(strcmp("Hello World!", str) == 0)
+        return 1;
+    return 0;
 }
 
 //#2: Replace str with the string "Hello World!"
 //You may assume that str is long enough to hold 'Hello World!'
 void fillHelloWorld(char* str) {
-    str = "Hello World!";
+   strcpy(str,"Hello World!");
 }
 
 //#3: Return a new string that is a copy of str
 //You may assume that str is null-terminated
 char* copyString(char* str) {
-    char newStr[strlen(str)+1];
+    char* newStr = malloc(sizeof(char) * (strlen(str)+1));
     strcpy(newStr, str);
     return newStr;
 }
@@ -34,9 +36,10 @@ char* copyString(char* str) {
 //NOTE: You will need to replicate the solution you did for Part 3 to fix an identical bug in this part.
 //However, that is not the only issue with this code.
 //HINT: You may need to add another argument to the function to make this work.
-char* copyArray(char* array) {
-    char newArray[sizeof(array)];
-    memcpy(newArray, array, sizeof(array));
+char* copyArray(char* array, int arraySize) {
+    char* newArray = malloc(sizeof(char) * arraySize);
+
+    memcpy(newArray, array, arraySize);
     return newArray;
 }
 
@@ -45,7 +48,7 @@ char* copyArray(char* array) {
 //EXAMPLE: On input str='Hello World!', begin=3, length=7, the function should return the string 'lo Worl'
 char* getSubstring(char* str, unsigned int begin, unsigned int length) {
     char* substr = malloc(length+1);
-    memcpy(substr, str[begin], length);
+    memcpy(substr, &str[begin], length);
     substr[length] = 0; //Null terminator
     return substr;
 }
@@ -53,7 +56,9 @@ char* getSubstring(char* str, unsigned int begin, unsigned int length) {
 //#6: Return the first word of str (space delimited) without modifying str
 //You may assume that str is null-terminated and is not empty
 char* getFirstWord(char* str) {
-    char* word = strtok(str, " ");
+    char* temp = calloc(strlen(str)+1, sizeof(char));
+    strcpy(temp, str);
+    char* word = strtok(temp, " ");
     return word;
 }
 
@@ -119,7 +124,7 @@ int main(int argc, char* argv[]) {
 	        printf("RUNNING TEST 4 - copyArray(char* array)\nReturn a new character array that is a copy of the passed-in array\n\n");
             printf("Input: bytes=");
 	        printBytes(bytes, sizeof(bytes));
-            cpy = copyArray(bytes); //You may change this line by adding another argument to copyArray
+            cpy = copyArray(bytes, sizeof(bytes)); //You may change this line by adding another argument to copyArray
 	        printf("Array returned from function (first %ld bytes): ", sizeof(bytes));
 	        printBytes(cpy, sizeof(bytes));
 	        printf("Expected: ");

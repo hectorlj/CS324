@@ -1,0 +1,11 @@
+1. I think it's not working because the function is not comparing the values that are being pointed to, it is only checking if the pointers are pointing at the same address so we just need to use strcmp, which does that for us.
+ 
+2. C strings are actually char arrays, which are non-assignable, unless initializing with a string literal. strcpy copies the string pointed to into the destination so we'll use that.
+
+3. The local variable only lasts as long as the function is running, so it needs to be allocated and returned as a pointer.
+ 
+4. Since the array is probably not null terminated then the new array will overflow and grab other bytes until it gets to a null character. we had to pass in the size of the array, not the size of the "string" since trying to find the size with strlen would have the same problems as memcpy, so we need to give it the size of the array, not the string
+
+5. the problem is that memcpy takes pointers as its first two arguments, i.e. string pointers, and so it needed the address of the position it needed to start at.
+
+6. strtok automatically modifies the string and tokenizes it, so it will always fail. We just need to create a copy of the string and then tokenize that copy

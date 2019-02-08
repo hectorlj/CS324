@@ -1,0 +1,51 @@
+9.11
+    Virtual address: 0x027c
+    A) Virtual address format:
+
+        13  12  11  10  9   8   7   6   5   4   3   2   1   0
+        --|----|--|---|---|---|---|----|---|---|---|---|---|--
+        0   0   0   0   1   0   0   1   1   1   1   1   0   0
+    
+    B) Address translation
+        
+        Parameter       Value
+        ---------------------
+        VPN             0x09
+        TLB index       0x01
+        TLB tag         0x02
+        TBL hit?        N
+        Page fault?     N
+        PPN             0x17
+
+    C) Physical address format
+        
+        11  10  9   8   7   6   5   4   3   2   1   0
+        --|---|---|---|---|---|---|---|---|---|---|---
+        0   1   0   1   1   1   1   1   1   1   0   0
+
+
+9.12
+    Virtual address: 0x03a9
+    
+    A) Virtual address format:
+
+        13  12  11  10  9   8   7   6   5   4   3   2   1   0
+        --|----|--|---|---|---|---|---|---|---|---|---|---|--
+        0   0   0   0   1   1   1   0   1   0   1   0   0   1
+    
+    B) Address translation
+        
+        Parameter       Value
+        ---------------------
+        VPN             0x0E
+        TLB index       0x02
+        TLB tag         0x03
+        TBL hit?        N
+        Page fault?     N
+        PPN             11
+
+    C) Physical address format
+        
+        11  10  9   8   7   6   5   4   3   2   1   0
+        --|---|---|---|---|---|---|---|---|---|---|---
+        0   1   0   0   0   1   1   0   1   0   0   1
