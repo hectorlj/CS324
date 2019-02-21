@@ -1,0 +1,104 @@
+PART 1
+-----------------
+1. Create a socket with socket() then connect it to the server address with connect()
+
+2. nc -l -k 1234
+
+3. a)  netstate -l -n -p
+   b)  
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+udp        0      0 0.0.0.0:52866           0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:54289           0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:5154            0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:48060           0.0.0.0:*                           - 
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:111             0.0.0.0:*                           - 
+udp        0      0 127.0.0.1:323           0.0.0.0:*                           -
+udp        0      0 0.0.0.0:631             0.0.0.0:*                           - 
+udp        0      0 127.0.0.1:758           0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:763             0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:33921           0.0.0.0:*                           - 
+udp        0      0 0.0.0.0:1234            0.0.0.0:*                           23166/nc
+
+   c)  it is a list of all the udp listening sockets, but I can only see the pid/command of the processes I own
+
+4.  hlj239@maine:~/Documents/CS324/hw5$ sha1sum -b client
+f155d8f9b8bbce3da3ab44f7b8e3ae3563b6354b *client
+
+5.  1)  hlj239@maine:~/Documents/CS324/hw5$ ./client 0.0.0.0 1234 foo bar baz catvideo
+
+    2)  foobarbazcatvideo
+
+6.  hlj239@colorado:~/Documents/CS324/hw5$ netstat -u  -n -p
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+udp        0      0 127.0.0.1:49692         127.0.0.1:1234          ESTABLISHED 16473/./client))
+
+7.  hlj239@texas:~/Documents/CS324/hw5$ netstat -u  -n -p
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+
+PART 2
+-------------------------------
+
+8.  hlj239@texas:~/Documents/CS324/hw5$ sha1sum -b client
+1171056007630e0b652e8b58da622342a4723a0b *client
+
+9.  hlj239@texas:~/Documents/CS324/hw5$ nc  -k -t -l 1234
+
+10.  1) netstat -t -n -p -l
+
+     2) Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name)
+tcp        0      0 0.0.0.0:36395           0.0.0.0:*               LISTEN      -   
+tcp        0      0 0.0.0.0:35053           0.0.0.0:*               LISTEN      -   
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      -   
+tcp        0      0 0.0.0.0:1234            0.0.0.0:*               LISTEN      28715/nc
+
+
+     3)  A list of all the listening tcp sockets
+
+11.  1) ./client 0.0.0.0 1234 foo bar baz catvideo
+     2) foobarbazcatvideo
+
+12. netstat -t -n -p 
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 192.168.2.146:916       192.168.168.155:2049    ESTABLISHED -   
+tcp        0      0 192.168.2.146:22        192.168.168.2:59621     SYN_RECV    -   
+tcp        0      0 192.168.2.146:50220     192.168.168.29:389      ESTABLISHED -   
+tcp        0      0 192.168.2.146:22        45.56.42.245:56120      ESTABLISHED -   
+tcp        0      0 127.0.0.1:57332         127.0.0.1:1234          ESTABLISHED 28979/./client
+tcp        0      0 192.168.2.146:49151     192.168.168.20:24007    ESTABLISHED -   
+tcp        0      0 127.0.0.1:1234          127.0.0.1:57332         ESTABLISHED 28977/nc
+tcp        0    208 192.168.2.146:22        73.98.163.34:3430       ESTABLISHED -   
+
+13.  netstat -t -n -p
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 192.168.2.146:22        192.168.168.2:9032      SYN_RECV    -   
+tcp        0      0 192.168.2.146:916       192.168.168.155:2049    ESTABLISHED -   
+tcp        0      0 192.168.2.146:50220     192.168.168.29:389      ESTABLISHED -   
+tcp        0      0 192.168.2.146:22        45.56.42.245:56120      ESTABLISHED -   
+tcp        0      0 192.168.2.146:22        45.56.42.245:56120      ESTABLISHED -   
+tcp        0      0 192.168.2.146:49151     192.168.168.20:24007    ESTABLISHED -   
+tcp        0    208 192.168.2.146:22        73.98.163.34:3430       ESTABLISHED -   
+tcp        0      0 192.168.2.146:22        192.168.168.2:10669     SYN_RECV    -   
+
+14.  hlj239@texas:~/Documents/CS324/hw5$ sha1sum -b server
+c66f540485d07d48be94d71afa7cb72ff5d98acb *server
+
+15.  1) hlj239@kentucky:~/Documents/CS324/hw5$ ./server 1234
+     2) hlj239@kentucky:~/Documents/CS324/hw5$ ./client 0.0.0.0 1234 foo bar baz catvideo
+
+16.  TCP: Ensures that the receiver gets the packets by numbering them. the receiver sends a message back to the sender confirming that the message was received.
+     UDP: There is no check if the packet was received, but is faster.
+
+17.  
