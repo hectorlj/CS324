@@ -9,7 +9,7 @@
 #define BUF_SIZE 500
 #define BUFFER_SIZE 4096
 int main(int argc, char *argv[]) {
-    char* pch;
+    
     char buffer[4096];
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
@@ -61,9 +61,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	freeaddrinfo(result);           /* No longer needed */
-    
-    fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
-    
+    char* temp = buffer;
+    int total_read = 0;
+    while(total_read < BUFFER_SIZE && fread(temp+total_read, 1, 1, stdin) == 1){
+        total_read++;
+    }
     
 	/* Send remaining command-line arguments as separate
 	   datagrams, and read responses from server */
@@ -73,31 +75,32 @@ int main(int argc, char *argv[]) {
 		/* +1 for terminating null byte */
 
 	//	if (len + 1 > BUF_SIZE) {
-    pch = strtok(buffer, " \n");
-    while(pch != NULL){
-        len = strlen(pch) + 1;
-        //printf("sending %s...\n", pch); 
-        if(len + 1 > BUFFER_SIZE){
-            fprintf(stderr, "Ignoring long message %s\n", pch);
-            continue;
-        }
-        if(write(sfd, pch, len) != len) {
+    
+   
+    int tempint = 0;
+    while(tempint != total_read){
+       
+        
+        if(write(sfd, &buffer[tempint], 1) != 1) {
 			fprintf(stderr, "partial/failed write\n");
 			exit(EXIT_FAILURE);
 		}
+        
         //printf("message sent!\n");
-        pch = strtok(NULL, " \n");
-    }
-		//nread = read(sfd, buf, BUF_SIZE);
-		//if (nread == -1) {
-		//	perror("read");
-		//	exit(EXIT_FAILURE);
-		//}
-
-		//printf("Received %zd bytes: %s\n", nread, buf);
-	//}
-
+       tempint++; 
+   }
+ 
+	while((nread = read(sfd, buf, BUF_SIZE)) > 0){
+		if (nread == -1) {
+			perror("read");
+			exit(EXIT_FAILURE);
+		}
     
+	printf("%s",buf);
+    memset(buf, 0, sizeof(buf));
+	}
+
+
 	exit(EXIT_SUCCESS);
 }
 
