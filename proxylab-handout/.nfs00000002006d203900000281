@@ -1,0 +1,6 @@
+==25294== Memcheck, a memory error detector
+==25294== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==25294== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==25294== Command: ./proxy 28200
+==25294== Parent PID: 25234
+==25294== 
