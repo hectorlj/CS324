@@ -1,6 +1,0 @@
-==14938== Memcheck, a memory error detector
-==14938== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==14938== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==14938== Command: ./proxy 8047
-==14938== Parent PID: 14872
-==14938== 

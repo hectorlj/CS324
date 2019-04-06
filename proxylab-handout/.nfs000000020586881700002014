@@ -1,6 +1,0 @@
-==16055== Memcheck, a memory error detector
-==16055== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==16055== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==16055== Command: ./proxy 22625
-==16055== Parent PID: 15992
-==16055== 
