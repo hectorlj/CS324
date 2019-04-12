@@ -8,7 +8,10 @@
 #define MAX_OBJECT_SIZE 102400
 #define MAXEVENTS 64
 #define BUFSIZE 8
-
+#define READ_REQUEST 0
+#define SEND_REQUEST 1
+#define READ_RESPONSE 2
+#define SEND_RESPONSE 3
 
 
 /* You won't lose style points for including this long line in your code */
@@ -30,7 +33,16 @@ void logBuf_init(log_t *sp, int n){
 void logBuf_deinit(log_t *sp){
     Free(sp->buf);
 }
-
+*/
+void writeLog(char* item){
+    FILE *fp;
+    fp = fopen("log.txt", "a");
+    if(fp == NULL)
+        fp = fopen("log.txt", "w");
+    fprintf(fp, "%s\n", item);
+    fflush(fp);
+}
+/*
 void createLog(char* item){
     char* temp = malloc(strlen(item));
     strcpy(temp, item);
@@ -115,26 +127,140 @@ char* logBuf_remove(log_t *sp)
 void command(void);
 int handle_client(int connfd);
 int handle_new_client(int listenfd);
+//int readRequest(int clientfd);
+int sendit(int serverfd);
 
 struct event_action{
     int(*callback)(int);
-    void *arg;
+    //void *arg;
     int clientfd;
     int serverfd;
     int state;
-    char* buf;
-    int numReadClient;
-    
+    char* bufptr;
+    char buf[MAX_OBJECT_SIZE];
+    int numReadClient, numWriteServer, numWrittenServer, numReadServer, numWrittenClient; 
 };
 
 int efd;
+//FILE* fp;
+void cliente(char* request, char* cause, char* errnum, char* shortmsg, char* longmsg){
+    char* bufp = request;
+    char body[MAXBUF];
+    sprintf(body, "<html><title>Tiny Error</title>");
+    sprintf(body, "%s<body bgcolor=" "ffffff" ">\r\n", body);
+    sprintf(body, "%s%s: %s\r\n", body, errnum, shortmsg);
+    sprintf(body, "%s<p>%s: %s\r\n", body, longmsg, cause);
+    sprintf(body, "%s<hr><em>The Tiny Web server</em>\r\n", body);
+    /* Print the HTTP response */
+    sprintf(bufp, "HTTP/1.0 %s %s\r\n", errnum, shortmsg);
+    sprintf(request, "Content-type: text/html\r\n");
+    sprintf(request, "Content-length: %d\r\n\r\n", (int)strlen(body));
+    bufp = body;
+}
 
+void read_requesthdrs(char* bufp){
+//    char buf[MAXLINE];
+//    strcpy(buf, bufp);
+    printf("%s", bufp);
+    while(strcmp(bufp, "\r\n")){
+        printf("%s", bufp);
+    }
+    return;
+}
+
+void readRequest(char* requestBuffer){    
+    writeLog("read req");
+  //  fprintf(fp, "%s" ,"getrequest");
+   // fflush(fp);
+/*    struct event_action *ea;
+    ea = malloc(sizeof(struct event_action));*/
+    //writeLog(ea->bufptr);
+    //size_t nleft;
+    //ssize_t nwritten;
+//    char* requestBuffer = ea->bufptr;
+//    int rc;
+    //struct addrinfo hints, *listp, *p;
+    //requestBuffer = bufp;
+    char method[MAXLINE], uri[MAXLINE], version[MAXLINE];
+    //tempbuf = requestBuffer;
+    //strcpy(tempbuf, bufp);
+    printf("%s\n", requestBuffer);
+    sscanf(requestBuffer, "%s, %s, %s", method, uri, version);
+    writeLog(uri);
+    //fopen("log.txt", "a");
+    //fprintf(fp, "%s\n", uri);
+    //fflush(fp);
+    if(strcasecmp(method, "GET")){
+        cliente(requestBuffer, method, "501", "Not Implemented", "Tiny does not implement this method");
+        return ;
+    }
+
+    read_requesthdrs(requestBuffer);
+    strtok(uri, ":");
+    char* host = strtok(NULL, ":");
+    host++;
+    host++;
+    char* port = strtok(NULL, "/");
+    char* filename = strtok(NULL, ":");
+    char *tmp = strdup(filename);
+    strcpy(filename, "/");
+    strcat(filename, tmp);
+    free(tmp);
+    int proxyfd, rc;
+    struct addrinfo hints, *listp, *p;
+    memset(&hints, 0, sizeof(struct addrinfo)) ;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_NUMERICSERV;
+    hints.ai_flags |= AI_ADDRCONFIG;
+    if((rc = getaddrinfo(host, port, &hints, &listp)) != 0){
+                fprintf(stderr, "getaddrinfo failed (%s:%s): %s\n", host, port, gai_strerror(rc));
+    }
+    for(p = listp; p; p = p->ai_next){
+        if((proxyfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) < 0)
+            continue;
+        if(connect(proxyfd, p->ai_addr, p->ai_addrlen)!=-1)
+            break;
+        close(proxyfd);
+    }
+    if (p == NULL)
+        fprintf(stderr, "Could not connect");
+    freeaddrinfo(listp);
+    send(proxyfd, "hello\n", 5, 0);
+    if(p != NULL){
+        if (fcntl(proxyfd, F_SETFL, fcntl(proxyfd, F_GETFL, 0) | O_NONBLOCK) < 0) {
+            fprintf(stderr, "error setting socket option\n");
+            exit(1);
+        }
+        //ea->serverfd = proxyfd;
+        //ea->filename = filename;
+        //ea->state = SEND_REQUEST;
+        //ea->callback = connect_servers; 
+        return ;
+    }
+    return ;
+}
+
+int connect_servers(int serverfd){
+    return 0;
+}
+
+int sendit(int serverfd){
+    struct event_action *ea;    
+    ea = malloc(sizeof(struct event_action));
+    memset(ea->buf, 0, sizeof(ea->buf));
+    char* response = ea->buf;
+//    sprintf(response, "GET %s HTTP/1.0\r\n", filename);
+    return 0;
+}
 int main(int argc, char **argv)
 {   
-    int listenfd, connfd;
+    
+    //fp = fopen("log.txt", "a");
+    writeLog("start!\n");
+    int listenfd;
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
-    int *argptr;
+    int argptr;
     struct epoll_event event;
     struct epoll_event *events;
     int i;
@@ -170,6 +296,11 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    if (fcntl(listenfd, F_SETFL, fcntl(listenfd, F_GETFL, 0) | O_NONBLOCK) < 0) {
+        fprintf(stderr, "error setting socket option\n");
+        exit(1);
+    }
+
     if((efd = epoll_create1(0)) < 0){
         fprintf(stderr, "error creating epoll fd\n");
         exit(1);
@@ -177,15 +308,12 @@ int main(int argc, char **argv)
 
     ea = malloc(sizeof(struct event_action));
     ea->callback = handle_new_client;
-    argptr = malloc(sizeof(int));
-    *argptr = listenfd;
-    ea->arg = argptr;
+    //argptr = malloc(sizeof(int));
+    argptr = listenfd;
+    ea->clientfd = argptr;
     event.data.ptr = ea;
     event.events = EPOLLIN | EPOLLET;
-    if (fcntl(listenfd, F_SETFL, fcntl(listenfd, F_GETFL, 0) | O_NONBLOCK) < 0) {
-        fprintf(stderr, "error setting socket option\n");
-        exit(1);
-    }
+    
     if(epoll_ctl(efd, EPOLL_CTL_ADD, listenfd, &event) < 0){
         fprintf(stderr, "error adding event\n");
         exit(1);
@@ -194,27 +322,28 @@ int main(int argc, char **argv)
     events = calloc(MAXEVENTS, sizeof(event));
     
     while(1){
-        n = epoll_wait(efd, events, MAXEVENTS, -1);
+        n = epoll_wait(efd, events, MAXEVENTS, 1000);
         for(i = 0; i < n; i++){
             ea = (struct event_action *)events[i].data.ptr;
-            argptr = ea->arg;
+            argptr = ea->clientfd;
             if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
                 /* An error has occured on this fd */
-                fprintf (stderr, "epoll error on fd %d\n", *argptr);
-                close(*argptr);
-                free(ea->arg);
+                fprintf (stderr, "epoll error on fd %d\n", argptr);
+                close(argptr);
+                //free(ea->clientfd);
                 free(ea);
                 continue;
             }
 
-            if (!ea->callback(*argptr)) {
-                close(*argptr);
-                free(ea->arg);
+            if (!ea->callback(argptr)) {
+                close(argptr);
+                //free(ea->buf);
                 free(ea);
             }
         }
     }
     free(events);
+//    fclose(fp);
 }
 
 int handle_new_client(int listenfd){
@@ -222,7 +351,7 @@ int handle_new_client(int listenfd){
     int connfd;
     struct sockaddr_storage clientaddr;
     struct epoll_event event;
-    int *argptr;
+    int arg;
     struct event_action *ea;
 
     clientlen = sizeof(struct sockaddr_storage);
@@ -234,19 +363,27 @@ int handle_new_client(int listenfd){
         }
         ea = malloc(sizeof(struct event_action));
         ea->callback = handle_client;
-        argptr = malloc(sizeof(int));
-        *argptr = connfd;
-
-        ea->arg = argptr;
+        
+        //argptr = malloc(sizeof(int));
+        arg = connfd;
+        
+        ea->clientfd = arg;
         event.data.ptr = ea;
         event.events = EPOLLIN | EPOLLET;
+        ea->state = READ_REQUEST;
+        ea->numReadClient = 0;
+        ea->numWriteServer = 0;
+        ea->numWrittenServer = 0; 
+        ea->numReadServer = 0;
+        ea->numWrittenClient = 0;
         if(epoll_ctl(efd, EPOLL_CTL_ADD, connfd, &event) < 0){
             fprintf(stderr, "error adding event\n");
             exit(1);
         }
     }
     
-    if(errno == EWOULDBLOCK || errno == EAGAIN){
+    if(errno == EWOULDBLOCK || errno == EAGAIN || errno == ECONNRESET){
+        close(ea->clientfd);
         return 1;
     } else {
         perror("error accepting");
@@ -255,14 +392,25 @@ int handle_new_client(int listenfd){
 }
 
 int handle_client(int connfd){
+    writeLog("client handling");
+    struct event_action *ea;
+    ea = malloc(sizeof(struct event_action));
     int len; 
-    char buf[MAXLINE];
+    char buffer[MAXLINE];
+    char *buf = buffer;
     while((len = recv(connfd, buf, MAXLINE, 0)) > 0){
-        send(connfd, buf, len, 0);
+        ea->numReadClient += len;
+        strcat(ea->buf, buf);
     }
     if(len == 0){
+        ea->bufptr = buf;
+        writeLog(buf);
+        //fprintf(fp,"%s\n", "made it here!");
+        //writeLog(ea->bufptr);
+        readRequest(ea->bufptr);
         return 0;
-    } else if(errno == EWOULDBLOCK || errno == EAGAIN){
+    } else if(errno == EWOULDBLOCK || errno == EAGAIN || errno == ECONNRESET){
+        //close(ea->clientfd);
         return 1;
     } else {
         perror("error reading");
@@ -270,12 +418,3 @@ int handle_client(int connfd){
     }
 }
 
-void doit(int fd){
-    size_t nleft;
-    ssize_t nwritten;
-    char* bufp;
-    int rc;
-    struct addrinfo hints, *listp, *p;
-    char requestBuffer[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
-    
-}
